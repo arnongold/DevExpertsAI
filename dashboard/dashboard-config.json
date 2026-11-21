@@ -1,0 +1,21 @@
+{
+  "datasets/surveys": {
+    "description": "1000 סקרים בדויים לדוגמה; הנושא, הערוץ, הציון, התלונה וסטטוס הפתרון חולצו מטקסט החוויה בסקריפט Python.",
+    "fixed": true,
+    "source": {
+      "format": "json",
+      "kind": "file",
+      "name": "survey_analysis.json",
+      "url": "/_blob/1386c65790914f6f0a4412d8767db6d7"
+    },
+    "title": "Sample: סקרי שירות לקוחות",
+    "updated": {
+      "at": "2026-11-21T18:46:00Z",
+      "by": "Claude"
+    }
+  },
+  "dash/meta": {
+    "title": "סקרי שירות לקוחות",
+    "lang": "he"
+  }
+}

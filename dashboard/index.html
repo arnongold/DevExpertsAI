@@ -1,0 +1,443 @@
+<meta name="dash-one-writer">
+<style>
+  .sv { direction: rtl; display: grid; gap: var(--cds-gap-xl); font-family: var(--font-anthropic-sans); color: var(--color-fg); }
+  .sv h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; text-wrap: balance; }
+  .sv h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; text-wrap: balance; }
+  .sv-lead { margin: var(--cds-gap-sm) 0 0; max-width: 70ch; line-height: 1.6; color: var(--color-fg); }
+  .sv-lead b { font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+  .sv-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cds-gap-md); }
+  .sv-tile, .sv-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+  .sv-tile { display: grid; gap: var(--cds-gap-xs); align-content: start; }
+  .sv-tile-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); letter-spacing: .02em; }
+  .sv-tile-value { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .sv-tile-unit { font-size: var(--cds-font-size-body); color: var(--color-fg-muted); }
+  .sv-tile-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .sv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: var(--cds-gap-lg); }
+  .sv-card { display: grid; gap: var(--cds-gap-sm); align-content: start; }
+  .sv-card.wide { grid-column: 1 / -1; }
+  .sv-sub { margin: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.5; }
+  .sv-sub b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .sv-chart { position: relative; min-height: 180px; min-width: 0; }
+  .sv-chart svg { display: block; overflow: visible; }
+  .sv-chart text { font-family: var(--font-anthropic-sans); font-size: 12px; fill: var(--cds-text-secondary); }
+  .sv-chart text.sv-name { fill: var(--color-fg); }
+  .sv-chart .sv-row:hover rect { opacity: .82; }
+  .sv-empty { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); padding-block: var(--cds-pad-md); }
+  .sv-tip { position: absolute; pointer-events: none; z-index: 5; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover); border-radius: var(--cds-radius); padding: 6px 10px; font-size: var(--cds-font-size-caption); color: var(--cds-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .sv-tip .sv-tip-h { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); margin-bottom: 2px; }
+  .sv-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .sv-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sv-legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .sv-ok { background: var(--color-ok); } .sv-warn { background: var(--color-warn); } .sv-bad { background: var(--color-bad); }
+  .sv-table-wrap { overflow-x: auto; }
+  .sv-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .sv-table th, .sv-table td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+  .sv-table th { color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+  .sv details { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.6; max-width: 80ch; }
+  .sv details summary { cursor: pointer; color: var(--color-fg); }
+</style>
+
+<div class="sv" dir="rtl" lang="he" data-read>
+  <header id="title">
+    <h1>סקרי שירות לקוחות</h1>
+    <p class="sv-lead">
+      ב-<b data-draw="cell" data-source="kpis" data-field="surveys" data-row="0">—</b> סקרים ציון שביעות הרצון הממוצע הוא
+      <b data-draw="cell" data-source="kpis" data-field="avg_score" data-row="0">—</b> מתוך 5, ו-<b data-draw="cell" data-source="kpis" data-field="unresolved_pct" data-row="0">—</b>% מהפניות לא נפתרו.
+      הנושא עם שיעור החוויות השליליות הגבוה ביותר הוא <b data-draw="cell" data-source="by_topic" data-field="topic" data-row="0">—</b>
+      (<b data-draw="cell" data-source="by_topic" data-field="neg_pct" data-row="0">—</b>%), והתלונה המרכזית הנפוצה היא
+      „<b data-draw="cell" data-source="by_complaint" data-field="complaint" data-row="0">—</b>”.
+    </p>
+  </header>
+
+  <section id="kpis" class="sv-tiles" aria-label="מדדים מרכזיים">
+    <div class="sv-tile">
+      <span class="sv-tile-label">סקרים שנאספו</span>
+      <span class="sv-tile-value" data-draw="cell" data-source="kpis" data-field="surveys" data-row="0">—</span>
+      <span class="sv-tile-note">ינואר 2025 עד נובמבר 2026</span>
+    </div>
+    <div class="sv-tile">
+      <span class="sv-tile-label">ציון שביעות רצון ממוצע</span>
+      <span><span class="sv-tile-value" data-draw="cell" data-source="kpis" data-field="avg_score" data-row="0">—</span> <span class="sv-tile-unit">/ 5</span></span>
+      <span class="sv-tile-note">ציון שנגזר מטקסט החוויה</span>
+    </div>
+    <div class="sv-tile">
+      <span class="sv-tile-label">שבעי רצון (ציון 4–5)</span>
+      <span><span class="sv-tile-value" data-draw="cell" data-source="kpis" data-field="satisfied_pct" data-row="0">—</span><span class="sv-tile-unit">%</span></span>
+      <span class="sv-tile-note">מכלל הסקרים</span>
+    </div>
+    <div class="sv-tile">
+      <span class="sv-tile-label">פניות שלא נפתרו</span>
+      <span><span class="sv-tile-value" data-draw="cell" data-source="kpis" data-field="unresolved_pct" data-row="0">—</span><span class="sv-tile-unit">%</span></span>
+      <span class="sv-tile-note">לפי תיאור הלקוח</span>
+    </div>
+    <div class="sv-tile">
+      <span class="sv-tile-label">זמן המתנה ממוצע</span>
+      <span><span class="sv-tile-value" data-draw="cell" data-source="kpis" data-field="avg_wait" data-row="0">—</span> <span class="sv-tile-unit">דק'</span></span>
+      <span class="sv-tile-note">בסקרים שציינו זמן המתנה</span>
+    </div>
+  </section>
+
+  <div class="sv-grid">
+    <section id="satisfaction" class="sv-card">
+      <h2>התפלגות שביעות רצון</h2>
+      <p class="sv-sub">מספר הסקרים לפי ציון, מ-1 (גרוע) עד 5 (מצוין).</p>
+      <div class="sv-chart" data-draw="scores" data-source="by_score"></div>
+    </section>
+
+    <section id="resolution" class="sv-card">
+      <h2>סטטוס פתרון הפנייה</h2>
+      <p class="sv-sub">פרמטר מבדל: איך הסתיימה הפנייה, והציון הממוצע בכל מצב.</p>
+      <div class="sv-chart" data-draw="resolution" data-source="by_resolution"></div>
+    </section>
+
+    <section id="topics" class="sv-card wide">
+      <h2>חוויית השירות לפי נושא הפנייה</h2>
+      <p class="sv-sub">חלוקת הסקרים בכל נושא לחוויה חיובית, מעורבת ושלילית. ממוין לפי שיעור החוויות השליליות; המספר בקצה הוא אחוז השליליות.</p>
+      <div class="sv-legend" aria-hidden="true"><span><i class="sv-ok"></i>חיובית</span><span><i class="sv-warn"></i>מעורבת</span><span><i class="sv-bad"></i>שלילית</span></div>
+      <div class="sv-chart" data-draw="topics" data-source="by_topic"></div>
+    </section>
+
+    <section id="complaints" class="sv-card">
+      <h2>תלונה מרכזית</h2>
+      <p class="sv-sub">התלונה החמורה ביותר בכל סקר שאינו חיובי, כאחוז מכלל הסקרים.</p>
+      <div class="sv-chart" data-draw="complaints" data-source="by_complaint"></div>
+    </section>
+
+    <section id="mentions" class="sv-card">
+      <h2>כל התלונות שהוזכרו</h2>
+      <p class="sv-sub">כל בעיה שלקוח הזכיר, גם אם לא הייתה המרכזית. סקר אחד יכול להזכיר כמה בעיות.</p>
+      <div class="sv-chart" data-draw="mentions" data-source="mentions"></div>
+    </section>
+
+    <section id="channels" class="sv-card wide">
+      <h2>ערוץ הפנייה</h2>
+      <p class="sv-sub">פרמטר מבדל: חוויית השירות בכל ערוץ. ממוין לפי ציון ממוצע; הציון מופיע בקצה.</p>
+      <div class="sv-legend" aria-hidden="true"><span><i class="sv-ok"></i>חיובית</span><span><i class="sv-warn"></i>מעורבת</span><span><i class="sv-bad"></i>שלילית</span></div>
+      <div class="sv-chart" data-draw="channels" data-source="by_channel"></div>
+      <div class="sv-table-wrap">
+        <table class="sv-table" data-source="by_channel" data-row-key="channel">
+          <thead><tr>
+            <th data-field="channel">ערוץ</th>
+            <th data-field="total">סקרים</th>
+            <th data-field="avg_score">ציון ממוצע</th>
+            <th data-field="neg_pct">% שליליות</th>
+            <th data-field="avg_wait">המתנה ממוצעת (דק')</th>
+          </tr></thead>
+          <tbody data-draw="channel_rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <details id="method">
+    <summary>איך חושבו המדדים</summary>
+    <p>הנתונים הם 1000 סקרים בדויים לדוגמה. כל השדות חולצו מטקסט החוויה החופשי: הנושא, הערוץ וזמן ההמתנה נלקחו ישירות מהטקסט, וכל פסקה סווגה לחיובית, מעורבת או שלילית.</p>
+    <p>הציון (1–5) נגזר מהסיווג ואינו ציון שהלקוח נתן: חוויה חיובית מקבלת 4, או 5 כשהלקוח גם ממליץ או מודה; מעורבת מקבלת 3; שלילית מקבלת 2, או 1 כשהלקוח גם מאיים לעזוב או לא ממליץ.</p>
+    <p>התלונה המרכזית היא הבעיה החמורה ביותר בסקר, לפי הסדר: תוצאת הטיפול, אחר כך התנהגות הנציג, ואחר כך ההמתנה. זמן ההמתנה הממוצע מחושב רק מסקרים שציינו מספר דקות.</p>
+  </details>
+</div>
+
+<script>
+  dash.calc('kpis', {
+    inputs: ['surveys'],
+    title: 'מדדים מרכזיים',
+    description: 'מספר הסקרים, ציון ממוצע, אחוז שבעי רצון, אחוז שלא נפתרו וזמן המתנה ממוצע.',
+    fn: (surveys) => {
+      const n = surveys.length;
+      const waits = surveys.filter((r) => r.wait_minutes != null);
+      return [{
+        surveys: n,
+        avg_score: Math.round(surveys.reduce((s, r) => s + r.score, 0) / n * 100) / 100,
+        satisfied_pct: Math.round(surveys.filter((r) => r.score >= 4).length / n * 1000) / 10,
+        unresolved_pct: Math.round(surveys.filter((r) => r.resolution === 'לא נפתר').length / n * 1000) / 10,
+        avg_wait: Math.round(waits.reduce((s, r) => s + r.wait_minutes, 0) / waits.length * 10) / 10,
+      }];
+    },
+  });
+
+  dash.calc('by_score', {
+    inputs: ['surveys'],
+    title: 'סקרים לפי ציון',
+    description: 'מספר ואחוז הסקרים בכל ציון שביעות רצון מ-1 עד 5.',
+    fn: (surveys) => [1, 2, 3, 4, 5].map((score) => {
+      const count = surveys.filter((r) => r.score === score).length;
+      return { score, count, pct: Math.round(count / surveys.length * 1000) / 10 };
+    }),
+  });
+
+  dash.calc('by_topic', {
+    inputs: ['surveys'],
+    title: 'חוויה לפי נושא',
+    description: 'לכל נושא: מספר סקרים, חלוקה לחיובית, מעורבת ושלילית, אחוז שליליות וציון ממוצע.',
+    fn: (surveys) => {
+      const key = { 'חיובית': 'pos', 'מעורבת': 'mix', 'שלילית': 'neg' };
+      const m = new Map();
+      for (const r of surveys) {
+        const g = m.get(r.topic) || { topic: r.topic, total: 0, pos: 0, mix: 0, neg: 0, sum: 0 };
+        g.total++; g.sum += r.score; g[key[r.sentiment]]++;
+        m.set(r.topic, g);
+      }
+      return [...m.values()].map((g) => ({
+        topic: g.topic, total: g.total, pos: g.pos, mix: g.mix, neg: g.neg,
+        neg_pct: Math.round(g.neg / g.total * 1000) / 10,
+        avg_score: Math.round(g.sum / g.total * 100) / 100,
+      })).sort((a, b) => b.neg_pct - a.neg_pct || a.avg_score - b.avg_score);
+    },
+  });
+
+  dash.calc('by_complaint', {
+    inputs: ['surveys'],
+    title: 'תלונה מרכזית',
+    description: 'מספר הסקרים לפי התלונה המרכזית, ואחוזם מכלל הסקרים. סקרים חיוביים ללא תלונה אינם כלולים.',
+    fn: (surveys) => {
+      const m = new Map();
+      for (const r of surveys) if (r.main_complaint !== 'ללא תלונה') m.set(r.main_complaint, (m.get(r.main_complaint) || 0) + 1);
+      return [...m].map(([complaint, count]) => ({ complaint, count, pct: Math.round(count / surveys.length * 1000) / 10 }))
+        .sort((a, b) => b.count - a.count);
+    },
+  });
+
+  dash.calc('mentions', {
+    inputs: ['surveys'],
+    title: 'כל התלונות שהוזכרו',
+    description: 'כמה סקרים הזכירו כל בעיה, מכל חלקי הטקסט.',
+    fn: (surveys) => {
+      const m = new Map();
+      for (const r of surveys) for (const c of String(r.all_complaints || '').split('; ').filter(Boolean)) m.set(c, (m.get(c) || 0) + 1);
+      return [...m].map(([complaint, count]) => ({ complaint, count, pct: Math.round(count / surveys.length * 1000) / 10 }))
+        .sort((a, b) => b.count - a.count);
+    },
+  });
+
+  dash.calc('by_channel', {
+    inputs: ['surveys'],
+    title: 'חוויה לפי ערוץ',
+    description: 'לכל ערוץ פנייה: מספר סקרים, חלוקת חוויה, אחוז שליליות, ציון ממוצע והמתנה ממוצעת.',
+    fn: (surveys) => {
+      const key = { 'חיובית': 'pos', 'מעורבת': 'mix', 'שלילית': 'neg' };
+      const m = new Map();
+      for (const r of surveys) {
+        const g = m.get(r.channel) || { channel: r.channel, total: 0, pos: 0, mix: 0, neg: 0, sum: 0, wsum: 0, wn: 0 };
+        g.total++; g.sum += r.score; g[key[r.sentiment]]++;
+        if (r.wait_minutes != null) { g.wsum += r.wait_minutes; g.wn++; }
+        m.set(r.channel, g);
+      }
+      return [...m.values()].map((g) => ({
+        channel: g.channel, total: g.total, pos: g.pos, mix: g.mix, neg: g.neg,
+        neg_pct: Math.round(g.neg / g.total * 1000) / 10,
+        avg_score: Math.round(g.sum / g.total * 100) / 100,
+        avg_wait: g.wn ? Math.round(g.wsum / g.wn * 10) / 10 : null,
+      })).sort((a, b) => b.avg_score - a.avg_score);
+    },
+  });
+
+  dash.calc('by_resolution', {
+    inputs: ['surveys'],
+    title: 'סטטוס פתרון',
+    description: 'מספר ואחוז הסקרים בכל סטטוס פתרון, והציון הממוצע בכל אחד.',
+    fn: (surveys) => ['נפתר במלואו', 'נפתר באיחור', 'נפתר חלקית', 'לא נפתר'].map((resolution) => {
+      const rs = surveys.filter((r) => r.resolution === resolution);
+      return {
+        resolution, count: rs.length,
+        pct: Math.round(rs.length / surveys.length * 1000) / 10,
+        avg_score: rs.length ? Math.round(rs.reduce((s, r) => s + r.score, 0) / rs.length * 100) / 100 : null,
+      };
+    }),
+  });
+</script>
+
+<script>
+  window.SV = (() => {
+    const SENT = [
+      { key: 'pos', name: 'חיובית', color: 'var(--color-ok)' },
+      { key: 'mix', name: 'מעורבת', color: 'var(--color-warn)' },
+      { key: 'neg', name: 'שלילית', color: 'var(--color-bad)' },
+    ];
+
+    // Writes the placeholder or the failure note; returns the rows when ready.
+    function ready(el, id) {
+      const d = dash.data(id);
+      if (d.status === 'ok' && Array.isArray(d.data) && d.data.length) return d.data;
+      const p = document.createElement('div');
+      p.className = 'sv-empty';
+      p.textContent = d.status === 'error' ? 'הגרף לא נטען: הנתונים לא זמינים כרגע.' : d.status === 'ok' ? 'אין נתונים להצגה.' : '—';
+      el.replaceChildren(p);
+      return null;
+    }
+
+    function tooltip(el) {
+      const tip = document.createElement('div');
+      tip.className = 'sv-tip';
+      tip.hidden = true;
+      el.appendChild(tip);
+      return {
+        show(ev, lines) {
+          tip.replaceChildren(...lines.map((l, i) => {
+            const d = document.createElement('div');
+            if (i === 0) d.className = 'sv-tip-h';
+            d.textContent = l;
+            return d;
+          }));
+          tip.hidden = false;
+          const b = el.getBoundingClientRect();
+          const tw = tip.offsetWidth, th = tip.offsetHeight;
+          const x = Math.min(Math.max(ev.clientX - b.left - tw / 2, 0), Math.max(0, b.width - tw));
+          let y = ev.clientY - b.top - th - 12;
+          if (y < 0) y = ev.clientY - b.top + 16;
+          tip.style.left = x + 'px';
+          tip.style.top = y + 'px';
+        },
+        hide() { tip.hidden = true; },
+      };
+    }
+
+    function measure(svg, texts, cls) {
+      const g = svg.append('g');
+      let w = 0;
+      for (const t of texts) w = Math.max(w, g.append('text').attr('class', cls).text(t).node().getComputedTextLength());
+      g.remove();
+      return w;
+    }
+
+    // Horizontal bars, right-to-left. o: {label, value, max, stacks, color, end, tip, aria}
+    function hbar(el, rows, o) {
+      el.replaceChildren();
+      const W = Math.max(280, el.clientWidth || 600);
+      const rowH = 30, H = rows.length * rowH + 4;
+      const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+        .attr('direction', 'rtl').attr('role', 'img').attr('aria-label', o.aria);
+      const lw = Math.min(measure(svg, rows.map((r) => r[o.label]), 'sv-name'), W * 0.4);
+      const ew = measure(svg, rows.map(o.end), '') + 10;
+      const x0 = W - lw - 12;
+      const plotW = Math.max(40, x0 - ew);
+      const max = o.max ?? (d3.max(rows, (r) => r[o.value]) || 1);
+      const x = d3.scaleLinear().domain([0, max]).range([0, plotW]);
+      const tip = tooltip(el);
+      const g = svg.selectAll('g.sv-row').data(rows).join('g').attr('class', 'sv-row')
+        .attr('transform', (r, i) => `translate(0,${i * rowH})`);
+      g.append('rect').attr('x', 0).attr('y', 0).attr('width', W).attr('height', rowH).style('fill', 'transparent');
+      g.append('text').attr('class', 'sv-name').attr('x', W).attr('y', rowH / 2).attr('dy', '0.35em')
+        .attr('text-anchor', 'start').text((r) => r[o.label]);
+      const bh = rowH - 12;
+      g.each(function (r) {
+        const row = d3.select(this);
+        const segs = o.stacks
+          ? o.stacks.map((s) => ({ v: r[s.key] / r.total * 100, color: s.color }))
+          : [{ v: r[o.value], color: o.color ? o.color(r) : dash.colors[0] }];
+        let cum = 0;
+        for (const s of segs) {
+          row.append('rect').attr('x', x0 - x(cum + s.v)).attr('y', 6).attr('width', Math.max(0, x(cum + s.v) - x(cum)))
+            .attr('height', bh).attr('rx', 2).style('fill', s.color);
+          cum += s.v;
+        }
+        row.append('text').attr('x', x0 - x(cum) - 6).attr('y', rowH / 2).attr('dy', '0.35em')
+          .attr('text-anchor', 'start').text(o.end(r));
+      });
+      g.on('pointermove', (ev, r) => tip.show(ev, o.tip(r))).on('pointerleave', () => tip.hide());
+    }
+
+    return { SENT, ready, tooltip, hbar };
+  })();
+
+  dash.draw('cell', (el) => {
+    const d = dash.data(el.dataset.source);
+    el.classList.toggle('dash-skeleton', d.status === 'loading');
+    const row = d.status === 'ok' && Array.isArray(d.data) ? d.data[Number(el.dataset.row)] : null;
+    const v = row ? row[el.dataset.field] : null;
+    el.textContent = v == null ? '—' : String(v);
+  });
+
+  dash.draw('scores', (el) => {
+    const rows = SV.ready(el, 'by_score');
+    if (!rows) return;
+    el.replaceChildren();
+    const W = Math.max(280, el.clientWidth || 500), H = 200, top = 22, bottom = 26;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`)
+      .attr('role', 'img').attr('aria-label', 'מספר הסקרים לכל ציון שביעות רצון מ-1 עד 5');
+    // Right-to-left: score 1 on the right.
+    const x = d3.scaleBand().domain([5, 4, 3, 2, 1]).range([0, W]).padding(0.28);
+    const y = d3.scaleLinear().domain([0, d3.max(rows, (r) => r.count) || 1]).range([H - bottom, top]);
+    const color = (s) => (s <= 2 ? 'var(--color-bad)' : s === 3 ? 'var(--color-warn)' : 'var(--color-ok)');
+    svg.append('line').attr('x1', 0).attr('x2', W).attr('y1', H - bottom).attr('y2', H - bottom).style('stroke', 'var(--cds-chart-axis)');
+    const tip = SV.tooltip(el);
+    const g = svg.selectAll('g.sv-row').data(rows).join('g').attr('class', 'sv-row');
+    g.append('rect').attr('x', (r) => x(r.score)).attr('width', x.bandwidth()).attr('y', (r) => y(r.count))
+      .attr('height', (r) => H - bottom - y(r.count)).attr('rx', 3).style('fill', (r) => color(r.score));
+    g.append('text').attr('x', (r) => x(r.score) + x.bandwidth() / 2).attr('y', (r) => y(r.count) - 6)
+      .attr('text-anchor', 'middle').attr('class', 'sv-name').text((r) => r.count);
+    g.append('text').attr('x', (r) => x(r.score) + x.bandwidth() / 2).attr('y', H - 8)
+      .attr('text-anchor', 'middle').text((r) => `ציון ${r.score}`);
+    g.on('pointermove', (ev, r) => tip.show(ev, [`ציון ${r.score}`, `${r.count} סקרים`, `${r.pct}% מכלל הסקרים`]))
+      .on('pointerleave', () => tip.hide());
+  });
+
+  dash.draw('resolution', (el) => {
+    const rows = SV.ready(el, 'by_resolution');
+    if (!rows) return;
+    const color = { 'נפתר במלואו': 'var(--color-ok)', 'נפתר באיחור': 'var(--color-warn)', 'נפתר חלקית': 'var(--color-warn)', 'לא נפתר': 'var(--color-bad)' };
+    SV.hbar(el, rows, {
+      label: 'resolution', value: 'count', color: (r) => color[r.resolution],
+      end: (r) => `${r.pct}% · ציון ${r.avg_score ?? '—'}`,
+      tip: (r) => [r.resolution, `${r.count} סקרים (${r.pct}%)`, `ציון ממוצע ${r.avg_score ?? '—'}`],
+      aria: 'מספר הסקרים בכל סטטוס פתרון והציון הממוצע בכל אחד',
+    });
+  });
+
+  dash.draw('topics', (el) => {
+    const rows = SV.ready(el, 'by_topic');
+    if (!rows) return;
+    SV.hbar(el, rows, {
+      label: 'topic', stacks: SV.SENT, max: 100,
+      end: (r) => `${r.neg_pct}%`,
+      tip: (r) => [r.topic, `${r.total} סקרים · ציון ממוצע ${r.avg_score}`, `חיובית ${r.pos} · מעורבת ${r.mix} · שלילית ${r.neg}`],
+      aria: 'חלוקת החוויה לחיובית, מעורבת ושלילית בכל נושא פנייה',
+    });
+  });
+
+  dash.draw('complaints', (el) => {
+    const rows = SV.ready(el, 'by_complaint');
+    if (!rows) return;
+    SV.hbar(el, rows, {
+      label: 'complaint', value: 'pct', color: () => 'var(--color-bad)',
+      end: (r) => `${r.pct}%`,
+      tip: (r) => [r.complaint, `${r.count} סקרים`, `${r.pct}% מכלל הסקרים`],
+      aria: 'התפלגות התלונה המרכזית בסקרים',
+    });
+  });
+
+  dash.draw('mentions', (el) => {
+    const rows = SV.ready(el, 'mentions');
+    if (!rows) return;
+    SV.hbar(el, rows, {
+      label: 'complaint', value: 'count',
+      end: (r) => String(r.count),
+      tip: (r) => [r.complaint, `הוזכרה ב-${r.count} סקרים`, `${r.pct}% מכלל הסקרים`],
+      aria: 'מספר הסקרים שהזכירו כל תלונה',
+    });
+  });
+
+  dash.draw('channels', (el) => {
+    const rows = SV.ready(el, 'by_channel');
+    if (!rows) return;
+    SV.hbar(el, rows, {
+      label: 'channel', stacks: SV.SENT, max: 100,
+      end: (r) => `ציון ${r.avg_score}`,
+      tip: (r) => [r.channel, `${r.total} סקרים · ${r.neg_pct}% שליליות`, `המתנה ממוצעת ${r.avg_wait ?? '—'} דק'`],
+      aria: 'חלוקת החוויה וציון ממוצע בכל ערוץ פנייה',
+    });
+  });
+
+  dash.draw('channel_rows', (tbody) => {
+    const d = dash.data('by_channel');
+    const rows = d.status === 'ok' && Array.isArray(d.data) ? d.data : [];
+    tbody.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr');
+      for (const f of ['channel', 'total', 'avg_score', 'neg_pct', 'avg_wait']) {
+        const td = document.createElement('td');
+        td.textContent = r[f] == null ? '—' : String(r[f]);
+        tr.appendChild(td);
+      }
+      return tr;
+    }));
+  });
+</script>
