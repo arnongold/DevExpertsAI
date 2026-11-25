@@ -1,0 +1,3 @@
+# Raw customer data stays local: it contains customer PII.
+data/*
+!data/.gitkeep
